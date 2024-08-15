@@ -3,18 +3,21 @@ import './App.css';
 import React, { useEffect, useState ,useRef } from 'react';
 
 function App() {
-  const [first, setFirst] = useState(0);
-  const a = useRef(0);
+  const [inputValue, setInputValue] = useState("");
+  const count = useRef(0);
   useEffect(() => {
-    a.current += 1;
-    console.log(`The value of a is ${a.current}`);
-  }, );
+    count.current = count.current + 1;
+  });
   return (
-    <div>
-      <p>The value of 'first' is: {first}</p>
-      <button onClick={() => setFirst(first + 1)}>Increment first</button>
-
-    </div>             
+    <>
+      <input
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+      />
+      <h1>Input value : {inputValue}</h1>
+      <h1>Render Count: {count.current}</h1>
+    </>
   );
 }
 export default App;
