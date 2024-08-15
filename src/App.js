@@ -1,23 +1,20 @@
+import React, { useState, useRef, useEffect } from 'react';
 
-import './App.css';
-import React, { useEffect, useState ,useRef } from 'react';
+function PreviousState() {
+  const [count, setCount] = useState(0);
+  const prevCountRef = useRef();  
 
-function App() {
-  const [inputValue, setInputValue] = useState("");
-  const count = useRef(0);
   useEffect(() => {
-    count.current = count.current + 1;
-  });
+    prevCountRef.current = count;   
+  }, [count]);
+
   return (
-    <>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-      />
-      <h1>Input value : {inputValue}</h1>
-      <h1>Render Count: {count.current}</h1>
-    </>
+    <div>
+      <h1>Current: {count}</h1>
+      <h2>Previous: {prevCountRef.current}</h2>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
   );
 }
-export default App;
+
+export default PreviousState;
