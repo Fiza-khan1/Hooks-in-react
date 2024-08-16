@@ -7,14 +7,36 @@ function App() {
     { id: 3, name: "Charlie", age: 35, location: "Chicago" }
   ];
 
+  const [form, setForm] = useState({ name: "Fiza", age: "22" });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState('admin');
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
 
   return (
     <div>
       <Greeting isLoggedIn={isLoggedIn} role={role} users={users} />
       {isLoggedIn ? (
-        <button onClick={() => setIsLoggedIn(false)}>Logout</button>
+        <>
+          <button onClick={() => setIsLoggedIn(false)}>Logout</button>
+          <input
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleInputChange}
+            placeholder='Enter name'
+          />
+          <input
+            type="text"
+            name="age"
+            value={form.age}
+            onChange={handleInputChange}
+            placeholder='Enter age'
+          />
+        </>
       ) : (
         <button onClick={() => setIsLoggedIn(true)}>Login</button>
       )}
