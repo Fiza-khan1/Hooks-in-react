@@ -1,21 +1,23 @@
 // App.js
 import React, { useState } from 'react';
-import { ThemeContext } from './component1';
+import { CounterContext } from './component1';
 import Page from './page';
 
 function App() {
-  const [theme, setTheme] = useState('dark');
-
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
-
+  
+  const [count,setCount]=useState(0)
+  const increment=()=>{
+    setCount(count+1)
+    
+  }
+  const decrement=()=>{
+    setCount(count-1)
+    
+  }
   return (
-    <ThemeContext.Provider value={theme}>  
-      <button onClick={toggleTheme}>Toggle Theme</button>
-      <Page />
-    </ThemeContext.Provider>
+    <CounterContext.Provider value={{ count, increment, decrement }}>  
+       <Page/>
+    </CounterContext.Provider>
   );
 }
-
 export default App;
