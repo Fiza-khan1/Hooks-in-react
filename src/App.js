@@ -1,53 +1,70 @@
-import React, { useState, useEffect, useRef } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css'; 
+import React, { useState } from 'react';
 
-function Timer() {
-  const [seconds, setSeconds] = useState(0);
-  const [isActive, setIsActive] = useState(false);
-  const intervalRef = useRef(null);
+function App() {
+  const users = [
+    { id: 1, name: "Alice", age: 30, location: "New York" },
+    { id: 2, name: "Bob", age: 25, location: "San Francisco" },
+    { id: 3, name: "Charlie", age: 35, location: "Chicago" }
+  ];
 
-  useEffect(() => {
-    console.log("useEffect triggered")
-    if (isActive) {
-      intervalRef.current = setInterval(() => {
-        setSeconds(prevSeconds => prevSeconds + 1);
-      }, 1000);
-      console.log("Interval ID:", intervalRef.current);
-    } else {
-      console.log("Stopping interval");
-      console.log("Interval ID:", intervalRef.current);
-      clearInterval(intervalRef.current);
-      console.log("Interval cleared:", intervalRef.current);
-    }
-    return () => clearInterval(intervalRef.current);
-  }, [isActive]);
-
-  const handleStart = () => {
-    setIsActive(true);
-  };
-
-  const handleStop = () => {
-    setIsActive(false);
-  };
-
-  const handleReset = () => {
-    setIsActive(false);
-    setSeconds(0);
-  };
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState('admin');
 
   return (
-    <div className="container mt-5">
-      <h1 className="mb-4">Simple Timer</h1>
-      <div className="d-flex justify-content-center mb-3">
-        <div className="display-4">{seconds} seconds</div>
-      </div>
-      <div className="d-flex justify-content-center">
-        <button onClick={handleStart} className="btn btn-success mr-2" disabled={isActive}>Start</button>
-        <button onClick={handleStop} className="btn btn-danger mr-2" disabled={!isActive}>Stop</button>
-        <button onClick={handleReset} className="btn btn-warning">Reset</button>
-      </div>
+    <div>
+      <Greeting isLoggedIn={isLoggedIn} role={role} users={users} />
+      {isLoggedIn ? (
+        <button onClick={() => setIsLoggedIn(false)}>Logout</button>
+      ) : (
+        <button onClick={() => setIsLoggedIn(true)}>Login</button>
+      )}
     </div>
   );
 }
 
-export default Timer;
+function Greeting({ isLoggedIn, role, users }) {
+  if (isLoggedIn) {
+    return (
+      <>
+        <h1>Welcome back!</h1>
+        <UserRole role={role} users={users} />
+      </>
+    );
+  } else {
+    return <h1>Please sign up.</h1>;
+  }
+}
+
+function UserRole({ role, users }) {
+  switch (role) {
+    case 'admin':
+      return (
+        <>
+          <p>You are an admin.</p>
+          <ShowList users={users} />
+        </>
+      );
+    case 'superuser':
+      return <p>You are a superuser.</p>;
+    case 'staff':
+      return <p>You are staff.</p>;
+    default:
+      return <p>Unknown role.</p>;
+  }
+}
+
+function ShowList({ users }) {
+  return (
+    <div>
+      {users.map(user => (
+        <div key={user.id}>
+          <p>Name: {user.name}</p>
+          <p>Age: {user.age}</p>
+          <p>Location: {user.location}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default App;
