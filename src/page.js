@@ -1,38 +1,77 @@
-import {  useReducer } from "react";
+import { useEffect, useReducer } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-function MyApp(){
-
-  function reducer(state,action){
-    console.log(action.type)
-    console.log("ACTION",action)
-      switch(action.type){
-        case 'increment':
-        return { count: state.count + 1 ,hidden:state.hidden=true};
+function MyApp() {
+  function reducer(state, action) {
+    switch (action.type) {
+      case 'increment':
+        return { ...state, count: state.count + 1 };
       case 'decrement':
-        return { count: state.count - 1 };
+        return { ...state, count: state.count>0 ? state.count-1 : state.count=0 };
       case 'reset':
-        return { count: 0  };
+        return { ...state, count: 0 };
+      case 'toggle':
+        return { ...state, on: !state.on };
+      case 'show':
+        return { ...state, hidden: !state.hidden };
       default:
         throw new Error();
     }
   }
 
-  const initialState = { count: 0 ,hidden:false};
-  const [state,dispatch]=useReducer(reducer,initialState)
-
-  return(
-    <>
-    <div>Counter {state.count}</div>
-    <button onClick={() => dispatch({ type: 'increment' })}>Click to Increment</button>
-    <button onClick={() => dispatch({ type: 'decrement' })}>Click to Decrement</button>
-    {state.hidden ? 'Show Counter' : 'Hide Counter'}
-    </>
-  )
-
-
 
   
-}
 
+  const initialState = { count: 0, hidden: false, on: false };
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    document.body.style.backgroundColor=state.on ? 'yellow' : 'grey'
+  }, [state.on])
+
+
+  return (
+    <div className="container mt-5">
+      <div className="text-center">
+        {!state.hidden && (
+          <div className="mb-4">
+            <h2>Counter: {state.count}</h2>
+            <button 
+              className="btn btn-success mx-2"
+              onClick={() => dispatch({ type: 'increment' })}
+            >
+              Increment
+            </button>
+            <button 
+              className="btn btn-danger mx-2"
+              onClick={() => dispatch({ type: 'decrement' })}
+            >
+              Decrement
+            </button>
+            <button 
+              className="btn btn-secondary mx-2"
+              onClick={() => dispatch({ type: 'reset' })}
+            >
+              Reset
+            </button>
+          </div>
+        )}
+        <button 
+          className="btn btn-info mx-2"
+          onClick={() => dispatch({ type: 'show' })}
+        >
+          {state.hidden ? 'Show Counter' : 'Hide Counter'}
+        </button>
+
+        <button 
+          className={`btn ${state.on ? 'btn-warning' : 'btn-dark'} mx-2`}
+          onClick={() => dispatch({ type: 'toggle' })}
+        >
+          {state.on ? 'Light is On' : 'Light is Off'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default MyApp;
