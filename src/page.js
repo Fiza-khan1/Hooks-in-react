@@ -1,4 +1,4 @@
-import { useEffect, useReducer ,useMemo} from "react";
+import { useEffect, useReducer,useMemo} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function MyApp() {
@@ -14,6 +14,8 @@ function MyApp() {
         return { ...state, on: !state.on };
       case 'show':
         return { ...state, hidden: !state.hidden };
+      case 'changeText':
+        return {...state,number:action.payload}
       default:
         throw new Error();
     } 
@@ -22,14 +24,38 @@ function MyApp() {
 
   
 
-  const initialState = { count: 0, hidden: false, on: false };
+  const initialState = { count: 0, hidden: false, on: false,number:0 };
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     document.body.style.backgroundColor=state.on ? 'yellow' : 'grey'
   }, [state.on])
+  
+  
 
+  const fact=useMemo(()=>{
+    let num = state.number;
+    let result = 1;
 
+    for (let i = num; i > 1; i--) {
+      result *= i;
+      
+    }
+
+    return result;
+
+},[state.number])
+
+const handlesubmit=(e)=>{
+  e.preventDefault()
+  console.log("Factorial is", fact);
+
+}
+
+  const handleInputChange = (e) => {   
+    dispatch({ type: 'changeText', payload: e.target.value });
+  };
+  console.log(state.number)
   return (
     <div className="container mt-5">
       <div className="text-center">
@@ -69,9 +95,17 @@ function MyApp() {
         >
           {state.on ? 'Light is On' : 'Light is Off'}
         </button>
+      <form onSubmit={handlesubmit}>
+        <h3 className="mt-5">Enter a number to check factorial </h3>
+     <input type="number"  value={state.number} placeholder="Enter number"  onChange={handleInputChange} /> 
+     <button type="submit">Submit</button>
+       </form>   
       </div>
+      <h1>Factiorial is {fact}</h1>
     </div>
-  );
-}
 
+    
+  );
+
+}
 export default MyApp;
