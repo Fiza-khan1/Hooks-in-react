@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer ,useMemo} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function MyApp() {
@@ -16,7 +16,7 @@ function MyApp() {
         return { ...state, hidden: !state.hidden };
       default:
         throw new Error();
-    }
+    } 
   }
 
 
