@@ -1,6 +1,6 @@
 
-import { useState,useMemo } from "react";
-
+import { useState,useMemo,useCallback } from "react";
+import Todo from './todosApp'
 
 const expensiveCalculation = (num) => {
   console.log("Calculating...");
@@ -17,20 +17,13 @@ function App(){
   const increment = () => {
     setCount((c) => c + 1);
   };
-  const addTodo = () => {
-    setTodos((t) => [...t, "New Todo"]);
-  };
+  const addTodo =useCallback( () => {
+    setTodos((t) => [...t, "New Todo"])
+  },[todos]);
 
   return (
     <div>
-      <div>
-        <h2>My Todos</h2>
-        {todos.map((todo, index) => {
-          return <p key={index}>{todo}</p>;
-        })}
-        <button onClick={addTodo}>Add Todo</button>
-      </div>
-      <hr />
+     <Todo todos={todos} addTodo={addTodo} ></Todo>
       <div>
         Count: {count}
         <button onClick={increment}>+</button>
