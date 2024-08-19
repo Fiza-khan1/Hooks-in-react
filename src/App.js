@@ -1,95 +1,128 @@
-import React, { useReducer, useState } from 'react';
+import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-let nextId = 3;
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'add':
-      return [
-        ...state,
-        { id: nextId++, text: action.text, done: false }
-      ];
-    case 'edit':
-      return state.map(task =>
-        task.id === action.id ? { ...task, text: action.text } : task
-      );
-    case 'delete':
-      return state.filter(task => task.id !== action.id);
-    default:
-      return state;
-  }
-}
-
-
-const initialTasks = [
-  { id: 0, text: 'Visit Kafka Museum', done: true },
-  { id: 1, text: 'Watch a puppet show', done: false },
-  { id: 2, text: 'Lennon Wall pic', done: false }
-];
-
-function MyApp() {
-  const [tasks, dispatch] = useReducer(reducer, initialTasks);
-  const [text, setText] = useState(''); // State for input text
-  const [editId, setEditId] = useState(null); // State for tracking which task is being edited
-
-
-  const handleInput = (e) => {
-    setText(e.target.value);
-  };
-
-  const addTask = () => {
-    if (text.trim()) {
-      dispatch({ type: 'add', text });
-      setText(''); 
-    }
-  };
-
-
-  const editTask = (id) => {
-    setEditId(id);
-    const taskToEdit = tasks.find(task => task.id === id);
-    setText(taskToEdit.text);
-  };
-
-
-  const saveEdit = () => {
-    if (text.trim()) {
-      dispatch({ type: 'edit', id: editId, text });
-      setEditId(null);
-      setText('');
-    }
-  };
-
-
-  const deleteTask = (id) => {
-    dispatch({ type: 'delete', id });
-  };
-
+// Square component
+function Square({ value, onSquareClick }) {
   return (
-    <>
-      <div>
-        {tasks.map((item) => (
-          <p key={item.id}>
-            {item.id} {item.text}
-            <button onClick={() => editTask(item.id)}>Edit</button>
-            <button onClick={() => deleteTask(item.id)}>Delete</button>
-          </p>
-        ))}
-      </div>
-
-      <input 
-        type="text" 
-        value={text} 
-        onChange={handleInput} 
-        placeholder="Enter new task" 
-      />
-      {editId !== null ? (
-        <button onClick={saveEdit}>Save Edit</button>
-      ) : (
-        <button onClick={addTask}>Add Task</button>
-      )}
-    </>
+    <button className="btn btn-outline-primary square w-100 h-100" onClick={onSquareClick}>
+      {value}
+    </button>
   );
 }
 
-export default MyApp;
+// Board component
+function Board({ xIsNext, squares, onPlay }) {
+  function handleClick(i) {
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    const nextSquares = squares.slice();
+    if (xIsNext) {
+      nextSquares[i] = 'X';
+    } else {
+      nextSquares[i] = 'O';
+    }
+    onPlay(nextSquares);
+  }
+
+  const winner = calculateWinner(squares);
+  let status;
+  if (winner) {
+    status = 'Winner: ' + winner;
+  } else {
+    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+  }
+
+  return (
+    <div>
+      <div className="alert alert-info text-center">{status}</div>
+      <div className="row">
+        {[0, 1, 2].map(i => (
+          <div className="col-4 col-md-4" key={i}>
+            <Square value={squares[i]} onSquareClick={() => handleClick(i)} />
+          </div>
+        ))}
+      </div>
+      <div className="row">
+        {[3, 4, 5].map(i => (
+          <div className="col-4 col-md-4" key={i}>
+            <Square value={squares[i]} onSquareClick={() => handleClick(i)} />
+          </div>
+        ))}
+      </div>
+      <div className="row">
+        {[6, 7, 8].map(i => (
+          <div className="col-4 col-md-4" key={i}>
+            <Square value={squares[i]} onSquareClick={() => handleClick(i)} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Game component
+export default function Game() {
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [currentMove, setCurrentMove] = useState(0);
+  const xIsNext = currentMove % 2 === 0;
+  const currentSquares = history[currentMove];
+
+  function handlePlay(nextSquares) {
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
+  }
+
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove);
+  }
+
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = 'Go to move #' + move;
+    } else {
+      description = 'Go to game start';
+    }
+    return (
+      <li key={move}>
+        <button className="btn btn-secondary" onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+    );
+  });
+
+  return (
+    <div className="container mt-4 d-flex justify-content-center">
+      <div className="card p-4">
+        <div className="card-body">
+          <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        </div>
+        <div className="card-footer">
+          <ol>{moves}</ol>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Utility function to calculate winner
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
